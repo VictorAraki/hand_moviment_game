@@ -9,26 +9,26 @@ class HandTracking:
         self.hand_landmarks = None
         self.cap = cv2.VideoCapture(0)
         self.full_list = []
+        self.hands_detected = False
 
-    def _build_frame(self, landmarks):
+    def build_frame(self):
         np_array = np.zeros((21, 3))
-        for i, landmark in enumerate(landmarks):
+        for i, landmark in enumerate(self.hand_landmarks.landmark):
             np_array[i, 0] = landmark.x
             np_array[i, 1] = landmark.y
             np_array[i, 2] = landmark.z
-        return np_array
+        self.full_list.append(np_array)
     
 
-    def save(self):
+    def save(self, score):
         np_array = np.array(self.full_list)
 
         current_time = time.strftime("%Y%m%d_%H%M%S")
-        file_name = "data_" + current_time + ".npy"
+        file_name = "data_" + current_time + "_score_" + str(score) + ".npy"
         np.save(file_name, np_array)
-    
-    def load(self, path):
-        loaded_array = np.load(path)
-        return loaded_array
+
+        # Reset
+        self.full_list = []
 
     def scan_hands(self):
         cap_success, self.frame = self.cap.read()
@@ -53,17 +53,12 @@ class HandTracking:
             m_finger_y = 0
             palm_base_y = 1
 
+            self.hands_detected = False
+
             if results.multi_hand_landmarks:
+                self.hands_detected = True
                 # For simplicity, we consider only the first hand detected (index 0).
                 self.hand_landmarks = results.multi_hand_landmarks[0]
-
-                # # create a list of np_array
-                # self.full_list.append(
-                #     self._build_frame(
-                #         self.hand_landmarks.landmark, 
-                #         frame_height, 
-                #         frame_width)
-                # )
                 m_finger_y = self.hand_landmarks.landmark[12].y
                 palm_base_y = self.hand_landmarks.landmark[0].y
 

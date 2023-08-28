@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.animation import FuncAnimation
 
-data = np.load('data_20230817_201340.npy')
+data = np.load('data_20230827_234316_score_44.npy')
 
 # Define the connections between points as pairs of indices
 connections = [(0,1), (1,2), (2,3), (3,4), (0,5),

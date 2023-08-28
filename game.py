@@ -57,7 +57,6 @@ class Game:
         for i in range(0, self.ruler_height, 20):
             pygame.draw.line(self.screen, BLACK, (self.ruler_x, self.ruler_y + i), (self.ruler_x + self.ruler_width, self.ruler_y + i), 2)
 
-
     def _user_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -90,6 +89,9 @@ class Game:
         if self.player_y < self.target_y:
             self.player_y = self.target_y
 
+    def fix_fps(self):
+        self.timer.tick(FPS)
+
     def update(self, m_finger_y, palm_base_y):
         self.screen.fill(BACKGROUND)
         if not self.active:
@@ -106,7 +108,7 @@ class Game:
         self._fix_player()
         
         pygame.display.flip()
-        self.timer.tick(FPS)
+        # self.fix_fps()
 
 if __name__ == "__main__":
     hand_track = HandTracking()
@@ -116,8 +118,13 @@ if __name__ == "__main__":
         game.update(m_finger_y, palm_base_y)
         hand_track.show_camera()
 
-        if game.remaining_time == 0:
+        if game.active and hand_track.hands_detected:
+            hand_track.build_frame()
+
+        if game.remaining_time == 0 and game.active:
             game.active = False
-            # Do something
+            hand_track.save(game.score)
+        
+        game.fix_fps()
 
     pygame.quit()
