@@ -43,7 +43,6 @@ class HandTracking:
             self.frame.flags.writeable = False
 
             results = self.hand_tracking.process(self.frame)
-            frame_height, frame_width, _ = self.frame.shape
 
             # Converts image back to BGR
             self.frame.flags.writeable = True
